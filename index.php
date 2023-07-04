@@ -9,11 +9,28 @@ class Player {
         $this->name = $name;
         $this->coins = $coins;
     }
+
+    public function point(Player $player2)
+    {
+        $this->coins++;
+        $player2->coins--;
+    }
+
+    public function bankrupt() 
+    {
+        return $this->coins == 0;
+    }
+
+    public function bank()
+    {
+        return $this->coins;
+    }
 }
 
 class Game {
     protected $player1;
     protected $player2;
+    protected $flips = 1;
 
     public function __construct(Player $player1, Player $player2)
     {
@@ -21,39 +38,43 @@ class Game {
         $this->player2 = $player2;
     }
 
+    public function flip()
+    {
+        return $flip = rand(0, 1) ? 'орёл': 'решка';  # Подбросить монетуы
+    }
+
+
+
     public function start()
     {
         while(true) 
-        {
-            $flip = rand(0, 1) ? 'орёл': 'решка';                                   # Подбросить монетуы
-            
-            if ($flip === 'орёл') {                                                 # Если орёл, п1 получает монету, п2 теряет
-                $this->player1->coins++;
-                $this->player2->coins--;
-            } elseif ($flip === 'решка') {                                          # Если решка, п1 теряет монету, п2 получает
-                $this->player1->coins--;
-                $this->player2->coins++;
+        {                   
+            if ($this->flip() === 'орёл') {                                         # Если орёл, п1 получает монету, п2 теряет                     
+                $this->player1->point($this->player2);
+            } else {                                                                # Если решка, п1 теряет монету, п2 получает
+                $this->player2->point($this->player1);
             }
 
-            if ($this->player1->coins === 0 || $this->player2->coins === 0) {       # Если у кого-то кол-во монет будет 0, то игра окончена
+            if ($this->player1->bankrupt()  || $this->player2->bankrupt()) {       # Если у кого-то кол-во монет будет 0, то игра окончена
                 return $this->end();
             }
+
+            $this->flips++;
         }
     }
 
-    public function winner() 
+    public function winner(): Player 
     {
-        if ($this->player1->coins > $this->player2->coins) {
-            return $this->player1;
-        } else {
-            return $this->player2;
-        }
+        return $this->player1->bank() > $this->player2->bank() ? $this->player1 : $this->player2;
     }
 
     public function end()
     {
             echo "
             Game over.
+            Было сделано {$this->flips} бросков.
+            {$this->player1->name}: {$this->player1->bank()}
+            {$this->player2->name}: {$this->player2->bank()}
             Winner is 
             {$this->winner()->name}
             "; 
