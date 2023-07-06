@@ -25,6 +25,11 @@ class Player {
     {
         return $this->coins;
     }
+
+    public function oods(Player $player2)
+    {
+        return $player1oods = round(100 * $this->bank() / ($this->bank() + $player2->bank())) . "%";
+    }
 }
 
 class Game {
@@ -43,9 +48,17 @@ class Game {
         return $flip = rand(0, 1) ? 'орёл': 'решка';  # Подбросить монетуы
     }
 
-
-
     public function start()
+    {
+        
+        echo "Шансы {$this->player1->name} = {$this->player1->oods($this->player2)} - у него {$this->player1->bank()} фишек <br>";
+        echo "Шансы {$this->player2->name} = {$this->player2->oods($this->player1)} - у него {$this->player2->bank()} фишек <br>";
+
+        $this->play();
+    }
+
+
+    public function play()
     {
         while(true) 
         {                   
@@ -55,7 +68,7 @@ class Game {
                 $this->player2->point($this->player1);
             }
 
-            if ($this->player1->bankrupt()  || $this->player2->bankrupt()) {       # Если у кого-то кол-во монет будет 0, то игра окончена
+            if (($this->player1->bankrupt()  || $this->player2->bankrupt())) {       # Если у кого-то кол-во монет будет 0, то игра окончена
                 return $this->end();
             }
 
@@ -71,20 +84,20 @@ class Game {
     public function end()
     {
             echo "
-            Game over.
-            Было сделано {$this->flips} бросков.
-            {$this->player1->name}: {$this->player1->bank()}
-            {$this->player2->name}: {$this->player2->bank()}
+            Game over.                                          <br>
+            Было сделано {$this->flips} бросков.                <br>
+            {$this->player1->name}: {$this->player1->bank()}    <br>
+            {$this->player2->name}: {$this->player2->bank()}    <br>
             Winner is 
-            {$this->winner()->name}
+            {$this->winner()->name}!
             "; 
     }   
 
 }
 
 $game = new Game(
-    new Player("Joe", 100),
-    new Player("Jane", 100)
+    new Player("Casino", 3000),
+    new Player("Saveliy", 100)
 );
 
 $game->start();
